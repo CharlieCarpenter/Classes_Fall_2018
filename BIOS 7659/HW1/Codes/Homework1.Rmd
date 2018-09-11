@@ -1,0 +1,14 @@
+---
+title: "BIOS 7659 Homework 1"
+author: "Charlie Carpenter"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: pdf_document
+---
+
+```{r, include = F}
+## Reading in Data
+
+
+```
+
+
