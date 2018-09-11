@@ -2,8 +2,35 @@
 title: "BIOS 7659 Homework 1"
 author: "Charlie Carpenter"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
+header-includes:
+    - \usepackage{setspace}\doublespacing
+    - \setlength\parindent{24pt}
 output: pdf_document
 ---
+
+```{r, eval = FALSE}
+ ##  - \usepackage{setspace}\doublespacing
+  # Double spaces the report
+
+ ## - \setlength\parindent{24pt}
+  # adds an indent at the beginning of each paragraph
+```
+
+Questions for office hours:
+
+Gene Chip vs. Arrays ?
+
+##1
+
+###Case Study 3
+
+  Design 3 would be unnecessarily costly compared to design 1, from which we can get much of the same information. Design 2 would result in a higher variance compared to design 1 unless we were able to replicate each array. This would double our overall cost to achieve a similar overall variance as design 1. Design 2 also has a large issue with potential dye bias. A dye swap would help assuage this issue.
+
+  Design 1 is the best option out of these three designs. It will have the lowest variance for the fewest number of arrays used. In other words it maximizes the cost-benefit ratio. One issue is the potential for dye bias. Randomizing patients to slides while keeping the technicians blind would help any issues with batch or array effects. This can be said for each design. All three have potentialarray effects unless the patients are randomly assigned to arrays. Batch effects could also bias the results unless they are randomly assigned or all arrays were hybridised in the same batch. 
+
+##1
+
+###Case Study 4
 
 ```{r, include = F}
 ## Reading in Data
