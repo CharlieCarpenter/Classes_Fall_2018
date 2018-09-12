@@ -5,8 +5,45 @@ date: "9/12/2018"
 output: pdf_document
 ---
 
-```{r}
+###3.
 
-```
 
-\begin 
+\begin{align}
+
+\end{align}
+
+###8.
+
+One-way effects model: $Y_{ij} = \mu + \kappa_i + \epsilon_{ij} \quad i = 1,2 \quad j = 1,2,3$
+
+Myostatin*Time (i): $(Yes, No)\times(24hr, 48hr, 72hr)$
+
+Means model: $Y_{ijk} = \mu_{ij} + \epsilon_{ijk}\quad i = 1,2 \quad j = 1,2,3 \quad k = 1,2$
+Two-way efffects model: $Y_{ijk} = \mu + \alpha_i + \tau_j + \gamma_{ij} + \epsilon_{ijk} \quad i = 1,2 \quad j = 1,2,3 \quad k = 1,2$
+
+Myostatin (i): 1 = No, 2 = Yes
+Time (j): 1 = 24hr, 2 = 48hr, 3 = 72hr
+Rep (k)
+
+1. $\mu_{2,2}$
+2. $\mu + \alpha_2 + \tau_2 + \gamma_{2,2}$
+3. $\kappa_5 - \kappa_6$
+4. $\tau_2 + \gamma_{2,2} - (\tau_3 + \gamma_{2,3})$
+
+###11.
+
+@ Full Rank 
+
+$$ \left[\begin{array}
+{rrrrrrrr}
+1 & 1 & 0 & 0 & t_1 & t_1 & 0 & 0\\
+1 & 1 & 0 & 0 & t_2 & t_2 & 0 & 0\\
+\vdot & \vdot & \vdot & \vdot & \vdot & \vdot & \vdot & \vdot &\\
+
+1 & 8 & 9 \\
+
+
+\end{array}\right]
+$$
+
+
