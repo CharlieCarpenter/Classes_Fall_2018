@@ -1,0 +1,12 @@
+---
+title: "BIOS 6643 HW 2"
+author: "Charlie Carpenter"
+date: "9/12/2018"
+output: pdf_document
+---
+
+```{r}
+
+```
+
+\begin 

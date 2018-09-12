@@ -16,9 +16,16 @@ output: pdf_document
   # adds an indent at the beginning of each paragraph
 ```
 
+```{r, include = FALSE}
+## Loading required packages
+library(pwr)
+```
+
 Questions for office hours:
 
 Gene Chip vs. Arrays ?
+
+*Answer below is probably wrong. Not interested in comparing patient 1 to patient 2. Is 3 the best???*
 
 ##1
 
@@ -31,6 +38,8 @@ Gene Chip vs. Arrays ?
 ##1
 
 ###Case Study 4
+
+
 
 ```{r, include = F}
 ## Reading in Data
