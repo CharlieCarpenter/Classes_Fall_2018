@@ -1,0 +1,122 @@
+---
+title: "BIOS 7659 Homework 1"
+author: "Charlie Carpenter"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+header-includes:
+    - \usepackage{setspace}\doublespacing
+    - \setlength\parindent{24pt}
+output: pdf_document
+---
+
+```{r, eval = FALSE}
+ ##  - \usepackage{setspace}\doublespacing
+  # Double spaces the report
+
+ ## - \setlength\parindent{24pt}
+  # adds an indent at the beginning of each paragraph
+```
+
+
+Questions for office hours:
+
+Gene Chip vs. Arrays ?
+
+*Answer below is probably wrong. Not interested in comparing patient 1 to patient 2. Is 3 the best???*
+
+##1
+
+###Case Study 3
+
+  We are interested in establishing patient clusters that express similar genes. With design 1 we have the issue of having two different types of comparisons to make: patients within an array and patients across arrays. This design would unnecessarily complicate the analysis. Also, if something goes wrong with one array we would be losing two samples instead of two.  Design two gives us the ability to use reference 
+  
+bad arrays and batches
+
+* a) no point in "comparing" patients, possible dye bias w/o randomization 
+      cost efficient
+* b) less cost efficient. gives us the ability to compare obs subgroups to noise (ref)
+
+ reference will give a good estimate of background 
+
+less worried about die bias when using a reference. More similar comparisons between patients than one. Would have to pay for all of the reference oligos
+
+* c) Most info per patient?
+
+
+  Design 3 would be unnecessarily costly compared to design 1, from which we can get much of the same information. Design 2 would result in a higher variance compared to design 1 unless we were able to replicate each array. This would double our overall cost to achieve a similar overall variance as design 1. Design 2 also has a large issue with potential dye bias. A dye swap would help assuage this issue.
+
+  Design 1 is the best option out of these three designs. It will have the lowest variance for the fewest number of arrays used. In other words it maximizes the cost-benefit ratio. One issue is the potential for dye bias. Randomizing patients to slides while keeping the technicians blind would help any issues with batch or array effects. This can be said for each design. All three have potential array effects unless the patients are randomly assigned to arrays. Batch effects could also bias the results unless they are randomly assigned or all arrays were hybridized in the same batch. 
+
+##1
+
+###Case Study 4
+
+* a) Not comparing anything directly, no replicates
+* b) dye bias, analysis can be more straight forwards
+* c) loop design can give more power, has replicates, no dye bias
+
+##2
+
+```{r, include = FALSE}
+library(pwr) ## For power.t.test
+library(tidyselect) ## For tidyselect
+```
+
+```{r, echo = F}
+## Fold change of 2 on log_2 scale is effect size of 1
+## sd estimate = 0.25 (MA section 3.8)
+
+## using pwr.t.test for many different power levels
+
+pwr.lvls <- seq(0.8,0.95, by = 0.05)
+
+## d = delta/sd
+pwr.n <- sapply(pwr.lvls, function(x){
+  pwr.t.test(d = 4, sig.level = 0.0001, power = x, type = "two.sample", alternative =
+               "two.sided")$n
+  
+}
+)
+
+## sample size calculation using the estimates from MA equation 3.2
+samp_size_fun <- function(pwr, sig, delta, se){
+  4*((qnorm(sig/2) + qnorm(1-pwr))/(delta/se))^2
+}
+
+MA.n <- sapply(pwr.lvls, samp_size_fun, sig = 0.0001, delta = 1, se = 0.25)
+```
+
+```{r}
+## Graphing power curves
+
+data.frame(Power = rep(pwr.lvls,2), n = c(pwr.n, MA.n), Distribution = rep(c("T", "Normal"),each = length(pwr.lvls))) %>% 
+  ggplot(aes(x = n, y = Power)) +
+  geom_line() +
+  geom_hline(yintercept = c(.80,.85,.90,.95), lwd =.5, colour = "red") +
+  facet_wrap(~Distribution) +
+  theme_bw()
+```
+
+##3
+
+```{r, include = FALSE}
+source("http://bioconductor.org/biocLite.R")
+biocLite("ssize")
+biocLite("impute")
+```
+
+```{r}
+## Reading in data sets
+array_data <- read.table("~/Documents/Classes_Fall_2018/BIOS 7659/HW1/arraydata.txt", row.names = 1, header = TRUE)
+
+sd_values <- read.table("~/Documents/Classes_Fall_2018/BIOS 7659/HW1/sdvalues.txt")
+
+pvalues <- read.table("~/Documents/Classes_Fall_2018/BIOS 7659/HW1/pvalues.txt")
+```
+
+
+
+
+
+
+        
+

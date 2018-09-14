@@ -32,18 +32,45 @@ Rep (k)
 
 ###11.
 
-@ Full Rank 
+@ The full rank model would be $Y_{ij} = \beta_0 + \beta_1Grp1 + \beta_2Grp2 + \beta_3Grp3 + \beta_4Time_i + beta_5Grp1*Time_j + \beta_6Grp2*Time_j + \beta_7Grp3*Time_j$
 
-$$ \left[\begin{array}
+There would be 8 columns in **X**.
+
+$$ 
+\left[\begin{array}
 {rrrrrrrr}
-1 & 1 & 0 & 0 & t_1 & t_1 & 0 & 0\\
-1 & 1 & 0 & 0 & t_2 & t_2 & 0 & 0\\
-\vdot & \vdot & \vdot & \vdot & \vdot & \vdot & \vdot & \vdot &\\
-
-1 & 8 & 9 \\
-
-
+1 & 0 & 0 & 0 & t_1 & 0 & 0 & 0\\
+1 & 0 & 0 & 0 & t_2 & 0 & 0 & 0\\
+\vdots & \vdots & \vdots & \vdots & \vdots & \vdots & \vdots & \vdots \\
+1 & 1 & 0 & 0 & t_i & t_i & 0 & 0\\
+1 & 1 & 0 & 0 & t_{i+i} & t_{i+1} & 0 & 0\\
+\vdots & \vdots & \vdots & \vdots & \vdots & \vdots & \vdots & \vdots \\
+1 & 0 & 1 & 0 & t_{i+j} & 0 & t_{i+j} & 0\\
+1 & 0 & 1 & 0 & t_{i+j+1} & 0 & t_{i+j+1} & 0\\
+\vdots & \vdots & \vdots & \vdots & \vdots & \vdots & \vdots & \vdots \\
+1 & 0 & 0 & 1 & t_{i+j+k} & 0 & 0 & t_{i+j+k} \\
+1 & 0 & 0 & 1 & t_{i+j+k+1} & 0 & 0 & t_{i+j+k+1} \\
 \end{array}\right]
 $$
 
+The LTFR model would be $Y_{ij} = \beta_0 + \beta_1Grp1 + \beta_2Grp2 + \beta_3Grp3 + \beta_4Grp4 + \beta_5Time_i + beta_6Grp1*Time_j + \beta_7Grp2*Time_j + \beta_7Grp3*Time_j + \beta_8Grp3*Time_j$.
 
+There would be 10 columns in **X**.
+$$ 
+\left[\begin{array}
+{rrrrrrrrr}
+1 & 1 & 0 & 0 & 0 & t_1 & t_1 & 0 & 0 & 0\\
+1 & 1 & 0 & 0 & 0 & t_2 & t_2 & 0 & 0 & 0\\
+\vdots & \vdots & \vdots & \vdots & \vdots & \vdots & \vdots & \vdots & \vdots & \vdots\\
+1 & 0 & 1 & 0 & 0 & t_i & 0 & t_i & 0 & 0\\
+1 & 0 & 1 & 0 & 0 & t_{i+i} & 0 & t_{i+1} & 0 & 0\\
+\vdots & \vdots & \vdots & \vdots & \vdots & \vdots & \vdots & \vdots & \vdots & \vdots\\
+1 & 0 & 0 & 1 & 0 & t_{i+j} & 0 & 0 & t_{i} & 0\\
+1 & 0 & 0 & 1 & 0 & t_{i+j+1} & 0 & 0 & t_{i+1} & 0\\
+\vdots & \vdots & \vdots & \vdots & \vdots & \vdots & \vdots & \vdots & \vdots & \vdots \\
+1 & 0 & 0 & 0 & 1 & t_{i+j+k} & 0 & 0 & 0 & t_{i+j+k} \\
+1 & 0 & 0 & 0 & 1 & t_{i+j+k+1} & 0 & 0 & 0 & t_{i+j+k+1} \\
+\end{array}\right]
+$$
+
+@ 
