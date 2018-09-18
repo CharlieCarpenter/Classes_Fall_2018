@@ -5,11 +5,23 @@ date: "9/12/2018"
 output: pdf_document
 ---
 
+```{r, include = F}
+library(MASS)
+library(tidyverse)
+```
+
 ###3.
 
+$$
+L = a^tX \\
+\tilde\beta = (X^tX)^-X^tY
+$$
 
 \begin{align}
-
+  L\tilde\beta = a^tX(X^tX)^-X^tY &\sim N[a^tX(X^tX)^-X^tX\beta, (a^tX(X^tX)^-X^t) I\sigma^2 (a^tX(X^tX)^-X^t)^t] \\
+ &\sim N[a^tP_xX\beta, (a^tX(X^tX)^-X^t)(X(X^tX)^-X^ta) \sigma^2] \\
+ &\sim N[a^tX\beta, (a^tX(X^tX)^-X^ta) \sigma^2] \\
+ &\sim N[L\beta, L(X^tX)^-L^t \sigma^2] 
 \end{align}
 
 ###8.
@@ -19,10 +31,11 @@ One-way effects model: $Y_{ij} = \mu + \kappa_i + \epsilon_{ij} \quad i = 1,2 \q
 Myostatin*Time (i): $(Yes, No)\times(24hr, 48hr, 72hr)$
 
 Means model: $Y_{ijk} = \mu_{ij} + \epsilon_{ijk}\quad i = 1,2 \quad j = 1,2,3 \quad k = 1,2$
+
 Two-way efffects model: $Y_{ijk} = \mu + \alpha_i + \tau_j + \gamma_{ij} + \epsilon_{ijk} \quad i = 1,2 \quad j = 1,2,3 \quad k = 1,2$
 
-Myostatin (i): 1 = No, 2 = Yes
-Time (j): 1 = 24hr, 2 = 48hr, 3 = 72hr
+Myostatin (i): 1 = No, 2 = Yes ; 
+Time (j): 1 = 24hr, 2 = 48hr, 3 = 72hr ;
 Rep (k)
 
 1. $\mu_{2,2}$
@@ -30,15 +43,33 @@ Rep (k)
 3. $\kappa_5 - \kappa_6$
 4. $\tau_2 + \gamma_{2,2} - (\tau_3 + \gamma_{2,3})$
 
+###9
+
+The normal equations are $X^tX\beta = X^tY$. Substituting $\tilde\beta = (X^tX)^-X^tY$ in for $\beta$ gives us
+
+\begin{align}
+ X^tX\tilde\beta &= X^tX(X^tX)^-X^tY \qquad \text{This is already true with Full Rank X} \\
+ &= X^tP_xY \\
+ &= (P_x^tX)^tY \\
+ &= [(XX^\dagger)^tX]^tY \\
+ &= (XX^\dagger X)^tY \\
+ &= X^tY
+\end{align}
+
 ###11.
 
-@ The full rank model would be $Y_{ij} = \beta_0 + \beta_1Grp1 + \beta_2Grp2 + \beta_3Grp3 + \beta_4Time_i + beta_5Grp1*Time_j + \beta_6Grp2*Time_j + \beta_7Grp3*Time_j$
+a)
+The full rank model would be 
+
+\begin{align}
+Y_{ij} = &\beta_0 + \beta_1Grp1_i + \beta_2Grp2_i + \beta_3Grp3_i + \beta_4Time_i +\\ &\beta_5Grp1_i\times Time_j + \beta_6Grp2_i\times Time_j + \beta_7Grp3_i\times Time_j  + \epsilon_{ij}
+\end{align}.
 
 There would be 8 columns in **X**.
 
 $$ 
 \left[\begin{array}
-{rrrrrrrr}
+{*{8}{c}}
 1 & 0 & 0 & 0 & t_1 & 0 & 0 & 0\\
 1 & 0 & 0 & 0 & t_2 & 0 & 0 & 0\\
 \vdots & \vdots & \vdots & \vdots & \vdots & \vdots & \vdots & \vdots \\
@@ -53,12 +84,18 @@ $$
 \end{array}\right]
 $$
 
-The LTFR model would be $Y_{ij} = \beta_0 + \beta_1Grp1 + \beta_2Grp2 + \beta_3Grp3 + \beta_4Grp4 + \beta_5Time_i + beta_6Grp1*Time_j + \beta_7Grp2*Time_j + \beta_7Grp3*Time_j + \beta_8Grp3*Time_j$.
+The LTFR model would be 
+
+\begin{align}
+Y_{ij} = &\beta_0 + \beta_1Grp1_i + \beta_2Grp2_i + \beta_3Grp3_i + \beta_4Grp4_i + \beta_5Time_i + \\
+&\beta_6Grp1_i\times Time_j + \beta_7Grp2_i\times Time_j + \beta_7Grp3_i\times Time_j + \beta_8Grp3_i\times Time_j +\epsilon_{ij}
+\end{align}.
 
 There would be 10 columns in **X**.
+
 $$ 
 \left[\begin{array}
-{rrrrrrrrr}
+{*{10}{c}}
 1 & 1 & 0 & 0 & 0 & t_1 & t_1 & 0 & 0 & 0\\
 1 & 1 & 0 & 0 & 0 & t_2 & t_2 & 0 & 0 & 0\\
 \vdots & \vdots & \vdots & \vdots & \vdots & \vdots & \vdots & \vdots & \vdots & \vdots\\
@@ -73,4 +110,149 @@ $$
 \end{array}\right]
 $$
 
-@ 
+b)
+
+Treating time as a class variable could be more appropriate for unequally spaced time points. It is very possible (and common in biological processes) for trends to start out linear and then level off at some point. If we treat time as a class variable we will have a much more flexible model to work with that could capture this type of curve. We would have to take into consideration the extra degrees of freedom we use and the lose of our ability to interpolate as the tradeoffs for this flexibility.
+
+###12
+
+a)  
+
+  i) $Y_{hjk} = \mu + \alpha_h + \tau_j + \gamma_{hj} + b_k + \epsilon_{hjk}$ h = {1,2,3}, j = {1,2,3}, k = {1,2,3,4,5,6}
+  
+  
+$$
+\left[\begin{array}
+{*{16}{c}}
+\mu & \alpha_1 & \alpha_2 & \alpha_3 & \tau_1 & \tau_2 & \tau_3 & \gamma_{1,1} & \gamma_{1,2} & \gamma_{1,3} & \gamma_{2,1} & \gamma_{2,2} & \gamma_{2,3} & \gamma_{3,1} & \gamma_{3,2} & \gamma_{3,3} \\
+1 & 1 & 0 & 0 & 1 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+1 & 1 & 0 & 0 & 1 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+1 & 1 & 0 & 0 & 0 & 1 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+1 & 1 & 0 & 0 & 0 & 1 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+1 & 1 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0\\
+1 & 1 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0\\
+1 & 0 & 1 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0\\
+1 & 0 & 1 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0\\
+1 & 0 & 1 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0\\
+1 & 0 & 1 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0\\
+1 & 0 & 1 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0\\
+1 & 0 & 1 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0\\
+1 & 0 & 0 & 1 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0\\
+1 & 0 & 0 & 1 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0\\
+1 & 0 & 0 & 1 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0\\
+1 & 0 & 0 & 1 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0\\
+1 & 0 & 0 & 1 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1\\
+1 & 0 & 0 & 1 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1\\
+\end{array}\right]
+$$
+  
+  ii) $Y_{hjk} = \mu + \alpha_h + \tau_j + \gamma_{hj} + b_k + \epsilon_{hjk}$ h = {1,2}, j = {1,2}, k = {1,2,3,4,5,6}
+  
+  We can also think of this as setting $\alpha_3, \ \tau_3$, and all associated $\gamma 's$ to 0.
+  
+$$
+\left[\begin{array}
+{*{9}{c}}
+\mu & \alpha_1 & \alpha_2  & \tau_1 & \tau_2 & \gamma_{1,1} & \gamma_{1,2} & \gamma_{2,1} & \gamma_{2,2} \\
+1 & 1 & 0 & 1 & 0 & 1 & 0 & 0 & 0 \\
+1 & 1 & 0 & 1 & 0 & 1 & 0 & 0 & 0 \\
+1 & 1 & 0 & 0 & 1 & 0 & 1 & 0 & 0 \\
+1 & 1 & 0 & 0 & 1 & 0 & 1 & 0 & 0 \\
+1 & 1 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+1 & 1 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+1 & 0 & 1 & 1 & 0 & 0 & 0 & 1 & 0 \\
+1 & 0 & 1 & 1 & 0 & 0 & 0 & 1 & 0 \\
+1 & 0 & 1 & 0 & 1 & 0 & 0 & 0 & 1 \\
+1 & 0 & 1 & 0 & 1 & 0 & 0 & 0 & 1 \\
+1 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+1 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+1 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+1 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+1 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+1 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+1 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+1 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+\end{array}\right]
+$$
+  
+  iii) $Y_{hjk} = \mu + \alpha_h + \tau_j + \gamma_{hj} + b_k + \epsilon_{hjk}$ h = {1,2}, j = {1,2}, k = {1,2,3,4,5,6}
+  
+$$
+\left[\begin{array}
+{*{9}{c}}
+\mu & \alpha_1 & \alpha_2  & \tau_1 & \tau_2 & \gamma_{1,1} & \gamma_{1,2} & \gamma_{2,1} & \gamma_{2,2} \\
+1 & 1 & 0 & 1 & 0 & 1 & 0 & 0 & 0 \\
+1 & 1 & 0 & 1 & 0 & 1 & 0 & 0 & 0 \\
+1 & 1 & 0 & 0 & 1 & 0 & 1 & 0 & 0 \\
+1 & 1 & 0 & 0 & 1 & 0 & 1 & 0 & 0 \\
+1 & 1 & 0 & -1 & -1 & -1 & -1 & 0 & 0 \\
+1 & 1 & 0 & -1 & -1 & -1 & -1 & 0 & 0 \\
+1 & 0 & 1 & 1 & 0 & 0 & 0 & 1 & 0 \\
+1 & 0 & 1 & 1 & 0 & 0 & 0 & 1 & 0 \\
+1 & 0 & 1 & 0 & 1 & 0 & 0 & 0 & 1 \\
+1 & 0 & 1 & 0 & 1 & 0 & 0 & 0 & 1 \\
+1 & 0 & 1 & -1 & -1 & 0 & 0 & -1 & -1 \\
+1 & 0 & 1 & -1 & -1 & 0 & 0 & -1 & -1 \\
+1 & -1 & -1 & 1 & 0 & -1 & 0 & -1 & 0 \\
+1 & -1 & -1 & 1 & 0 & -1 & 0 & -1 & 0 \\
+1 & -1 & -1 & 0 & 1 & 0 & -1 & 0 & -1 \\
+1 & -1 & -1 & 0 & 1 & 0 & -1 & 0 & -1 \\
+1 & -1 & -1 & -1 & -1 & 1 & 1 & 1 & 1 \\
+1 & -1 & -1 & -1 & -1 & 1 & 1 & 1 & 1 \\
+\end{array}\right]
+$$
+b)
+$$
+\begin{array}
+{cc | ccc | ccc | ccccccccc}
+ & Int & & Group & & & Time & & & & & & G \times T & & & & \\
+A \ linear: & 1 & 1 & 0 & 0 & -1 & 0 & 1 & -1 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+B \ linear: & 1 & 0 & 1 & 0 & -1 & 0 & 1 & 0 & 0 & 0 & -1 & 0 & 1 & 0 & 0 & 0 \\
+\hline
+L: & 0 & 1 & -1 & 0 & 0 & 0 & 0 & -1 & 0 & 1 & 1 & 0 & -1 & 0 & 0 & 0
+\end{array}
+$$
+
+```{r}
+## X / Design Matrix
+X <- matrix(c(1, 1,0,0, 1,0,0, 1,0,0,0,0,0,0,0,0,
+              1, 1,0,0, 0,1,0, 0,1,0,0,0,0,0,0,0,
+              1, 1,0,0, 0,0,1, 0,0,1,0,0,0,0,0,0,
+              1, 1,0,0, 1,0,0, 1,0,0,0,0,0,0,0,0,
+              1, 1,0,0, 0,1,0, 0,1,0,0,0,0,0,0,0,
+              1, 1,0,0, 0,0,1, 0,0,1,0,0,0,0,0,0,
+              
+              1, 0,1,0, 1,0,0, 0,0,0,1,0,0,0,0,0,
+              1, 0,1,0, 0,1,0, 0,0,0,0,1,0,0,0,0,
+              1, 0,1,0, 0,0,1, 0,0,0,0,0,1,0,0,0,
+              1, 0,1,0, 1,0,0, 0,0,0,1,0,0,0,0,0,
+              1, 0,1,0, 0,1,0, 0,0,0,0,1,0,0,0,0,
+              1, 0,1,0, 0,0,1, 0,0,0,0,0,1,0,0,0,
+              
+              1, 0,0,1, 1,0,0, 0,0,0,0,0,0,1,0,0,
+              1, 0,0,1, 0,1,0, 0,0,0,0,0,0,0,1,0,
+              1, 0,0,1, 0,0,1, 0,0,0,0,0,0,0,0,1,
+              1, 0,0,1, 1,0,0, 0,0,0,0,0,0,1,0,0,
+              1, 0,0,1, 0,1,0, 0,0,0,0,0,0,0,1,0,
+              1, 0,0,1, 0,0,1, 0,0,0,0,0,0,0,0,1),
+      nrow = 18, byrow = T)
+
+## Moore-Penrose inverse
+H <- ginv(t(X) %*% X) %*% (t(X) %*% X)
+
+L <- c(0, 1,-1,0, 0,0,0, -1,0,1, 1,0,-1, 0,0,0)
+
+L%*%H %>% as.vector %>% round
+```
+
+Which is our L, so comparing the linear trends of two groups is estimable.
+
+###14
+
+```{r, echo = F}
+knitr::include_graphics("~/Desktop/Screen Shot 2018-09-17 at 6.38.23 PM.png")
+```
+
+The two *Estimate* statements show that there is no evidence of pairwise differences between the control group and the two treatment groups at baseline in the Dog data. There is also no evidence of a difference in the overall means for the three treatments or the 5 time points as shown in the *Contrast* statements above.
+
+We know that there is much more going on in these data, but I just wanted to confirm thefull rank reparameterization theorem with constrasts.

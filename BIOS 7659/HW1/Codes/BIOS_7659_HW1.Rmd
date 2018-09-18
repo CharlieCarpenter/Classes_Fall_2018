@@ -8,7 +8,7 @@ header-includes:
 output: pdf_document
 ---
 
-```{r, eval = FALSE}
+```{r, include = FALSE}
  ##  - \usepackage{setspace}\doublespacing
   # Double spaces the report
 
@@ -16,58 +16,31 @@ output: pdf_document
   # adds an indent at the beginning of each paragraph
 ```
 
-
-Questions for office hours:
-
-Gene Chip vs. Arrays ?
-
-*Answer below is probably wrong. Not interested in comparing patient 1 to patient 2. Is 3 the best???*
-
 ##1
 
-###Case Study 3
+#####Case Study 3
 
-  We are interested in establishing patient clusters that express similar genes. With design 1 we have the issue of having two different types of comparisons to make: patients within an array and patients across arrays. This design would unnecessarily complicate the analysis. Also, if something goes wrong with one array we would be losing two samples instead of two.  Design two gives us the ability to use reference 
-  
-bad arrays and batches
+  We are interested in establishing patient clusters that express similar genes. With design 1 we have the issue of having two different types of comparisons to make: patients within an array and patients across arrays. This design would force patients to competitively hybridize on the array which would be counterproductive to establishing clusters of patients. Also, if something goes wrong with one array we would be losing two samples instead of two. Design two gives us the ability to use the reference as an estimate of background variability while keeping patient comparisons consistent (all are across arrays). Design 3 would also keep this consistency in comparisons while saving on costs spent on reference samples, but without giving us the benefit of the reference. 
 
-* a) no point in "comparing" patients, possible dye bias w/o randomization 
-      cost efficient
-* b) less cost efficient. gives us the ability to compare obs subgroups to noise (ref)
+#####Case Study 4
 
- reference will give a good estimate of background 
-
-less worried about die bias when using a reference. More similar comparisons between patients than one. Would have to pay for all of the reference oligos
-
-* c) Most info per patient?
-
-
-  Design 3 would be unnecessarily costly compared to design 1, from which we can get much of the same information. Design 2 would result in a higher variance compared to design 1 unless we were able to replicate each array. This would double our overall cost to achieve a similar overall variance as design 1. Design 2 also has a large issue with potential dye bias. A dye swap would help assuage this issue.
-
-  Design 1 is the best option out of these three designs. It will have the lowest variance for the fewest number of arrays used. In other words it maximizes the cost-benefit ratio. One issue is the potential for dye bias. Randomizing patients to slides while keeping the technicians blind would help any issues with batch or array effects. This can be said for each design. All three have potential array effects unless the patients are randomly assigned to arrays. Batch effects could also bias the results unless they are randomly assigned or all arrays were hybridized in the same batch. 
-
-##1
-
-###Case Study 4
-
-* a) Not comparing anything directly, no replicates
-* b) dye bias, analysis can be more straight forwards
-* c) loop design can give more power, has replicates, no dye bias
+  Design 1 doesn't give us any replicates of time points, meaning if a GeneChip becomes damaged we lose all of our information about that time point. Also, obviously, we have no technical replicates of time points. Design 2 we have direct comparisons to time 0 for times 1 - 6, but across-array comparisons for all other time points. Design two would be better for a question along the lines of, "What genes stay consistent along the time course?" Design three, the loop design, is best for this question. The design has replicates of each time point, allows for direct and across-array comparisons of all time points, and would directly address the question of interest. This design also would give more statistical power to find genes expressing similar profiles throughout the time course. One draw back of the loop design is that is does require a more complicated analysis.
 
 ##2
 
 ```{r, include = FALSE}
 library(pwr) ## For power.t.test
-library(tidyselect) ## For tidyselect
+library(tidyverse) ## For tidyverse
+library(knitr) ## For kable
 ```
 
-```{r, echo = F}
+```{r}
 ## Fold change of 2 on log_2 scale is effect size of 1
 ## sd estimate = 0.25 (MA section 3.8)
 
 ## using pwr.t.test for many different power levels
 
-pwr.lvls <- seq(0.8,0.95, by = 0.05)
+pwr.lvls <- c(0.8, 0.95)
 
 ## d = delta/sd
 pwr.n <- sapply(pwr.lvls, function(x){
@@ -77,46 +50,133 @@ pwr.n <- sapply(pwr.lvls, function(x){
 }
 )
 
-## sample size calculation using the estimates from MA equation 3.2
-samp_size_fun <- function(pwr, sig, delta, se){
-  4*((qnorm(sig/2) + qnorm(1-pwr))/(delta/se))^2
-}
-
-MA.n <- sapply(pwr.lvls, samp_size_fun, sig = 0.0001, delta = 1, se = 0.25)
+## Rounding up our sample sizes
+ceiling(pwr.n)
 ```
 
 ```{r}
-## Graphing power curves
+## True powers for these sample sizes
+true.pwr <- sapply(c(7,8), function(x){
+  pwr.t.test(d = 4, sig.level = 0.0001, n = x, type = "two.sample", alternative =
+               "two.sided")$power
+}
+)
+```
 
-data.frame(Power = rep(pwr.lvls,2), n = c(pwr.n, MA.n), Distribution = rep(c("T", "Normal"),each = length(pwr.lvls))) %>% 
-  ggplot(aes(x = n, y = Power)) +
-  geom_line() +
-  geom_hline(yintercept = c(.80,.85,.90,.95), lwd =.5, colour = "red") +
-  facet_wrap(~Distribution) +
-  theme_bw()
+  The standard deviation of kidney gene expression in inbred strains of mice on Affymetrix GeneChips is estimated to be 0.25. This has been a consistent finding in many past studies. The null hypothesis for each of the 20,000 probe sets is that there is no difference in true mean gene expression between the treated and untreated mice, with the alternative hypothesis being that there is a difference in the true mean gene expression. An alpha level of 0.0001 for the two-sided test on each of the 20,000 probe sets gives us an estimated 2 false discoveries. With 7 mice per group we can achieve approximately 90% power, and with 8 mice per group we can achieve over 95% power. These calculations are summarized in the table below. 
+
+```{r, echo = FALSE}
+data.frame(N = c(14,16), 
+           True_Power = true.pwr, 
+           Cost = paste("$", c(14000,16000), sep = "")) %>% 
+  kable(format = "markdown", paddiing = 2, align = "c")
 ```
 
 ##3
 
 ```{r, include = FALSE}
-source("http://bioconductor.org/biocLite.R")
-biocLite("ssize")
-biocLite("impute")
+#source("http://bioconductor.org/biocLite.R")
+#biocLite("ssize")
+#biocLite("impute")
 ```
 
 ```{r}
 ## Reading in data sets
-array_data <- read.table("~/Documents/Classes_Fall_2018/BIOS 7659/HW1/arraydata.txt", row.names = 1, header = TRUE)
+array_data <- read.table("~/Documents/Classes_Fall_2018/BIOS 7659/HW1/arraydata.txt", row.names = 1, header = TRUE) %>% as.matrix()
 
 sd_values <- read.table("~/Documents/Classes_Fall_2018/BIOS 7659/HW1/sdvalues.txt")
 
 pvalues <- read.table("~/Documents/Classes_Fall_2018/BIOS 7659/HW1/pvalues.txt")
 ```
 
+a)
+```{r}
+##
+(pwr.n.2 <- sapply(pwr.lvls, function(x){
+  pwr.t.test(d = 1/.5, sig.level = 0.001, power = x, type = "two.sample",
+             alternative= "two.sided")$n
+  
+}
+)) %>% 
+  ceiling
+```
 
+We would need 12 and 15 mice per group in order to achieve 80% and 95% power, respectively. 
 
+$\pi_0$ is the expected proportion of false null hypotheses. Here we are assuming that the null is true for all 20,000 t-tests we run, which is an unreal assumption. With the FDR approach we assume that some small percent of null hypotheses are false. So, if we to assume 5% of null hypotheses were false (common) $\pi_0$ would be 0.95.
 
+b)
 
+```{r}
+(FDR.n <- sapply(pwr.lvls, function(x){
+  ssize::power.t.test.FDR(sd = .5, delta = 1, FDR.level = 0.05, pi0 = .95,
+                          power = x, type = "two.sample", 
+                          alternative = "two.sided")$n
+}
+)) %>% 
+  ceiling
+```
 
-        
+Here we only need 11 and 14 mice per group in order to achieve 80% and 95% power, respectively. 
+
+c)
+
+```{r}
+set.seed(5)
+plot.pwr.8 <- ssize::ssize(sd = sd_values$V2, delta = 1, 
+                           sig.level = 0.001, power = 0.8)
+
+set.seed(5)
+plot.pwr.95 <- ssize::ssize(sd = sd_values$V2, delta = 1, 
+                            sig.level = 0.001, power = 0.95)
+
+ssize::ssize.plot(plot.pwr.8, xlim = c(0,30), main = "Power = 0.8")
+ssize::ssize.plot(plot.pwr.95, xlim = c(0,30), main = "Power = 0.95")
+
+```
+
+Based on this plot we would need 20 mice per group in order for 90% of our genes to have at least 80% power, and we'd need 20 mice per group in order for 87% of our genes to have at least 95% power.
+
+e)
+
+```{r, include = FALSE}
+## sourcing samr function stored locally
+
+lapply(## Files to source from samr package
+  list("SAM.R", "samr.morefuns.R", "samr.R", "samr.xlfuncs.R", "SAMseq.R"),
+  function(x){
+    ## working directory
+    ff <- paste("~/Documents/Classes_Fall_2018/BIOS 7659/HW1/Codes/samr/R/",
+                x ,sep = "") 
+    source(ff)
+  })
+```
+
+```{r}
+set.seed(234)
+data <- list(x=array_data,y=c(rep(1,4),rep(2,4)), geneid=row.names(array_data), genenames = row.names(array_data), logged2 = TRUE)
+
+samr.obj <-  samr(data, resp.type="Two class unpaired", nperms=100)
+```
+
+```{r}
+samr.assess.samplesize(samr.obj = samr.obj, data = data, dif = 1) %>% 
+samr.assess.samplesize.plot()
+```
+
+The plots displayed show the estimaed FDR and FNR vs the numer of genes being tested for different (per group) sample sizes. The dashed lines represent the range from the 10^th^ to 90^th^ percentiles of the permutation distributions.
+
+We will be testing over 20,000 genes so these graphs aren't very informative for our design, but we might be able to infer appropriate sample sizes from them. Since our FDR (which equals 1 - power under the assumptions of this method) stays under 0.05 for the entire span of the plot for a sample size of 8 and the "confidence interval" is shrinking the entire way, we should be achieve over 95% power with 8 mice per group according to this method.
+
+f)
+
+  The *pwr.t.test* function uses standard parametric methods for evaluating the power of t-tests. We will be assuming the standard deviation is the same for all genes, and we will also assume that the null hypothesis is true for all t-tests. This is the most constrained of all these methods
+
+  The FDR approach we assume that some small percent of null hypotheses for the t-tests are false and adjusts the p-values accordingly. This is a less conservative approach than the classical assumption that all null hypotheses are true.
+
+  *ssize* (realistically) does not assume that the standard deviation is the same for all genes. Instead it pools the standard deviations from pilot data and gives us a cumulative power curve based on the percent of genes that hit the desired power. This method is based off of t-tests as well and uses a Bonferonni correction for each test. This is the most conservative of all these methods.
+  
+  *PowerAtlas* would have estimated the proportion of true positive, true negative, and false positive signals we'd see in based on p-values from pilot data.
+
+  *samr* gives estimates of false discovery and false negative rates based off of permutation distribution of gene 'scores' in pilot data. This is the least constrained of all these methods.
 
